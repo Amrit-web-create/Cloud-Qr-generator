@@ -1,0 +1,230 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Studio — QR Generator</title>
+<meta name="description" content="Design your QR code with full control: shapes, 60 colour combos, backgrounds, logos and labels. Export PNG or JPG up to 4K.">
+<meta name="theme-color" content="#1F181C">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:ital,wght@1,500;1,600&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/studio.css">
+<script>try{var s=sessionStorage;if(s.getItem('qro-t'))document.documentElement.classList.add('px-in');else if(s.getItem('qro-seen'))document.documentElement.classList.add('skip-loader');}catch(e){}</script>
+</head>
+<body data-page="studio">
+
+<div class="loader" id="loader" aria-hidden="true"><div class="loader-in">
+  <div class="loader-logo"><span style="--i:0">S</span><span style="--i:1">t</span><span class="serif" style="--i:2">u</span><span class="serif" style="--i:3">d</span><span class="serif" style="--i:4">i</span><span class="serif" style="--i:5">o</span></div>
+  <div class="loader-bar"><i id="loader-bar"></i></div>
+  <div class="loader-count" id="loader-count">000</div>
+</div></div>
+
+<div class="app">
+  <!-- ================= top bar ================= -->
+  <header class="topbar">
+    <a class="brand" href="index.html" aria-label="Back to home">
+      <span class="brand-mark" id="brandMark"></span><span class="brand-t">QR <span class="serif" style="font-weight:500;color:var(--dusty)">studio</span></span>
+    </a>
+    <div class="top-mid">
+      <button class="ico-btn" id="btnUndo" aria-label="Undo" title="Undo (Ctrl+Z)" disabled><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 14L4 9l5-5"/><path d="M4 9h10a6 6 0 0 1 0 12h-3"/></svg></button>
+      <button class="ico-btn" id="btnRedo" aria-label="Redo" title="Redo (Ctrl+Y)" disabled><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 14l5-5-5-5"/><path d="M20 9H10a6 6 0 0 0 0 12h3"/></svg></button>
+    </div>
+    <div class="top-actions">
+      <a class="btn btn-ghost btn-sm hide-s" href="templates.html">Templates</a>
+      <button class="btn btn-ghost btn-sm hide-s" id="btnRandom" title="Random style"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.8 4.7L18.5 9.5l-4.7 1.8L12 16l-1.8-4.7L5.5 9.5l4.7-1.8z"/><path d="M19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8z"/></svg>Surprise me</button>
+      <button class="btn btn-ghost btn-sm" id="btnReset">Reset</button>
+      <button class="btn btn-primary btn-sm" id="btnDownload"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11M7 11l5 5 5-5M5 20h14"/></svg>Download</button>
+    </div>
+  </header>
+
+  <div class="workspace">
+    <!-- ================= tool rail ================= -->
+    <nav class="rail" id="rail" role="tablist" aria-label="Design tools"></nav>
+
+    <!-- ================= panels ================= -->
+    <aside class="panel" id="panel">
+
+      <!-- CONTENT -->
+      <section class="pane" data-pane="content" role="tabpanel">
+        <h2 class="pane-title">Content <small>What should the QR open?</small></h2>
+        <div class="chips" id="typeChips"></div>
+        <div class="fields" id="fields"></div>
+        <div class="enc" id="encoded" aria-live="polite"></div>
+        <div class="group">
+          <div class="g-title">Error correction <i class="tip" data-tip="Higher = scans even when damaged or covered by a logo. Logo forces High.">?</i></div>
+          <div class="seg" id="eccSeg">
+            <button data-set="ecc" data-val="L">Low<span>7%</span></button>
+            <button data-set="ecc" data-val="M">Medium<span>15%</span></button>
+            <button data-set="ecc" data-val="Q">Quartile<span>25%</span></button>
+            <button data-set="ecc" data-val="H">High<span>30%</span></button>
+          </div>
+        </div>
+      </section>
+
+      <!-- SHAPES -->
+      <section class="pane" data-pane="shapes" role="tabpanel" hidden>
+        <h2 class="pane-title">Shapes <small>Body and corner eyes</small></h2>
+        <div class="group"><div class="g-title">Body pattern</div><div class="grid-shapes" id="gBody"></div></div>
+        <div class="group"><div class="g-title">Eye frame</div><div class="grid-shapes" id="gFrame"></div></div>
+        <div class="group"><div class="g-title">Eye centre</div><div class="grid-shapes" id="gBall"></div></div>
+        <p class="note">Heart, sparkle and circle/leaf eyes are the most decorative — always test-scan with your phone before printing.</p>
+      </section>
+
+      <!-- COLORS -->
+      <section class="pane" data-pane="colors" role="tabpanel" hidden>
+        <h2 class="pane-title">Colours <small>Foreground &amp; background</small></h2>
+        <div class="group">
+          <div class="g-title">Colour style</div>
+          <div class="seg">
+            <button data-set="fg.type" data-val="solid">Solid</button>
+            <button data-set="fg.type" data-val="linear">Linear</button>
+            <button data-set="fg.type" data-val="radial">Radial</button>
+          </div>
+        </div>
+        <div class="row2">
+          <div class="field"><label>Foreground</label><label class="color"><input type="color" data-bind="fg.c1" aria-label="Foreground colour"><span data-hex="fg.c1"></span></label></div>
+          <div class="field" data-when="fg.type!=solid"><label>Gradient end</label><label class="color"><input type="color" data-bind="fg.c2" aria-label="Gradient end colour"><span data-hex="fg.c2"></span></label></div>
+          <div class="field"><label>Background</label><label class="color"><input type="color" data-bind="bg" aria-label="Background colour"><span data-hex="bg"></span></label></div>
+        </div>
+        <div class="field" data-when="fg.type=linear"><label>Gradient angle <output data-out="fg.angle" data-fmt="deg"></output></label><input class="range" type="range" min="0" max="360" step="5" data-bind="fg.angle"></div>
+
+        <div class="group">
+          <div class="g-title">Eye colours <i class="tip" data-tip="Give the three corner eyes their own colour — optional.">?</i></div>
+          <div class="row2">
+            <div class="field"><label>Eye frame</label><label class="color"><input type="color" data-bind="eyeFrameColor" aria-label="Eye frame colour"><span data-hex="eyeFrameColor" data-empty="Same as QR"></span></label></div>
+            <div class="field"><label>Eye centre</label><label class="color"><input type="color" data-bind="eyeBallColor" aria-label="Eye centre colour"><span data-hex="eyeBallColor" data-empty="Same as QR"></span></label></div>
+          </div>
+          <button class="link-btn" id="btnEyeReset">Reset eye colours</button>
+        </div>
+
+        <div class="contrast" id="contrast" role="status"></div>
+
+        <div class="group">
+          <div class="g-title">60 colour combos <small id="palCount"></small></div>
+          <div class="pal-grid" id="palGrid"></div>
+        </div>
+      </section>
+
+      <!-- BACKGROUND -->
+      <section class="pane" data-pane="background" role="tabpanel" hidden>
+        <h2 class="pane-title">Background <small>Layout, colour &amp; image</small></h2>
+        <div class="group">
+          <div class="g-title">Layout</div>
+          <div class="layouts">
+            <button data-set="bgMode" data-val="small"><i class="lo lo-small"><u></u></i>Small</button>
+            <button data-set="bgMode" data-val="center"><i class="lo lo-center"><u></u></i>Centre</button>
+            <button data-set="bgMode" data-val="full"><i class="lo lo-full"><u></u></i>Full</button>
+            <button data-set="bgMode" data-val="none"><i class="lo lo-none"><u></u></i>Clear</button>
+          </div>
+          <p class="note" id="bgNote"></p>
+        </div>
+        <div class="row2">
+          <div class="field" data-when="bgMode!=none"><label>QR card colour</label><label class="color"><input type="color" data-bind="bg" aria-label="Card colour"><span data-hex="bg"></span></label></div>
+          <div class="field" data-when="bgMode=center|bgMode=small"><label>Outer colour</label><label class="color"><input type="color" data-bind="outer" aria-label="Outer colour"><span data-hex="outer"></span></label></div>
+        </div>
+        <div class="group" data-when="bgMode!=none">
+          <div class="g-title">Background image</div>
+          <div class="upload" id="bgUpload">
+            <div class="thumb" id="bgThumb"></div>
+            <div class="up-actions"><button class="btn btn-ghost btn-sm" id="btnBgPick">Upload from gallery</button><button class="link-btn" id="btnBgClear" hidden>Remove</button></div>
+          </div>
+          <input type="file" id="fileBg" accept="image/*" hidden>
+        </div>
+        <div class="field"><label>Quiet zone <output data-out="margin" data-fmt="mod"></output></label><input class="range" type="range" min="0" max="8" step="1" data-bind="margin"></div>
+      </section>
+
+      <!-- LOGO -->
+      <section class="pane" data-pane="logo" role="tabpanel" hidden>
+        <h2 class="pane-title">Logo &amp; icon <small>Put your brand in the centre</small></h2>
+        <div class="group">
+          <div class="g-title">Icons</div>
+          <div class="icon-grid" id="iconGrid"></div>
+        </div>
+        <div class="group">
+          <div class="g-title">Your own logo</div>
+          <div class="upload">
+            <div class="thumb" id="logoThumb"></div>
+            <div class="up-actions"><button class="btn btn-ghost btn-sm" id="btnLogoPick">Upload from gallery</button><button class="link-btn" id="btnLogoClear" hidden>Remove logo</button></div>
+          </div>
+          <input type="file" id="fileLogo" accept="image/*" hidden>
+        </div>
+        <div class="field" data-when="hasLogo"><label>Logo size <output data-out="logoSize" data-fmt="pct"></output></label><input class="range" type="range" min="10" max="30" step="1" data-bind="logoSize" data-scale="100"></div>
+        <div class="group" data-when="logoKind=upload">
+          <div class="g-title">Logo badge</div>
+          <div class="seg">
+            <button data-set="logoShape" data-val="circle">Circle</button>
+            <button data-set="logoShape" data-val="rounded">Rounded</button>
+            <button data-set="logoShape" data-val="square">Square</button>
+            <button data-set="logoShape" data-val="none">None</button>
+          </div>
+          <div class="field" data-when="logoShape!=none" style="margin-top:14px"><label>Badge colour</label><label class="color"><input type="color" data-bind="logoColor" aria-label="Badge colour"><span data-hex="logoColor"></span></label></div>
+        </div>
+        <p class="note" data-when="hasLogo">Error correction switches to <b>High</b> automatically so your QR still scans.</p>
+      </section>
+
+      <!-- FRAME -->
+      <section class="pane" data-pane="frame" role="tabpanel" hidden>
+        <h2 class="pane-title">Label <small>Call-to-action bar</small></h2>
+        <div class="switch-row"><span>Show label bar</span><button class="switch" role="switch" data-toggle="frameOn" aria-label="Show label bar"><i></i></button></div>
+        <div data-when="frameOn">
+          <div class="field"><label for="frameText">Text</label><input id="frameText" class="input" type="text" maxlength="28" data-bind="frameText" placeholder="SCAN ME"></div>
+          <div class="chips small" id="frameChips"></div>
+          <div class="row2">
+            <div class="field"><label>Bar colour</label><label class="color"><input type="color" data-bind="frameColor" aria-label="Bar colour"><span data-hex="frameColor"></span></label></div>
+            <div class="field"><label>Text colour</label><label class="color"><input type="color" data-bind="frameTextColor" aria-label="Text colour"><span data-hex="frameTextColor"></span></label></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- EXPORT -->
+      <section class="pane" data-pane="export" role="tabpanel" hidden>
+        <h2 class="pane-title">Export <small>Real, sharp, print-ready</small></h2>
+        <div class="group">
+          <div class="g-title">Format</div>
+          <div class="seg">
+            <button data-set="exportFmt" data-val="png">PNG<span>transparent ok</span></button>
+            <button data-set="exportFmt" data-val="jpg">JPG<span>smaller file</span></button>
+          </div>
+        </div>
+        <div class="group">
+          <div class="g-title">Size <small id="sizeInfo"></small></div>
+          <div class="seg wrap">
+            <button data-set="exportSize" data-val="512" data-num>512</button>
+            <button data-set="exportSize" data-val="1024" data-num>1024</button>
+            <button data-set="exportSize" data-val="2048" data-num>2048</button>
+            <button data-set="exportSize" data-val="3072" data-num>3072</button>
+            <button data-set="exportSize" data-val="4096" data-num>4096</button>
+          </div>
+        </div>
+        <div class="field" data-when="exportFmt=jpg"><label>JPG quality <output data-out="quality" data-fmt="pct"></output></label><input class="range" type="range" min="60" max="100" step="1" data-bind="quality" data-scale="100"></div>
+        <div class="field"><label for="fname">File name</label><input id="fname" class="input" type="text" maxlength="48" data-bind="filename" placeholder="qr-code"></div>
+        <button class="btn btn-primary big" id="btnDownload2"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11M7 11l5 5 5-5M5 20h14"/></svg><span id="dlLabel">Download PNG</span></button>
+        <button class="btn btn-ghost big" id="btnCopy" style="margin-top:10px">Copy image</button>
+      </section>
+    </aside>
+
+    <!-- ================= canvas stage ================= -->
+    <main class="stage-wrap" id="stageWrap">
+      <div class="stage-area" id="stageArea">
+        <div class="checker" id="checker"><canvas id="preview" aria-label="QR code preview" role="img"></canvas></div>
+        <div class="sample-badge" id="sampleBadge" hidden>Sample preview — add your content</div>
+      </div>
+      <div class="statusbar">
+        <span class="stat" id="statInfo">—</span>
+        <span class="stat badge" id="statScan">—</span>
+      </div>
+    </main>
+  </div>
+</div>
+
+<script src="js/qr-core.js"></script>
+<script src="js/qr-render.js"></script>
+<script src="js/data.js"></script>
+<script src="js/qr-kit.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/studio.js"></script>
+</body>
+</html>
